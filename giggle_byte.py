@@ -3,7 +3,7 @@ from openai import OpenAI
 #calling ollama's llama3.1
 client = OpenAI(
     base_url="http://localhost:11434/v1",
-    api_key="llama3.1" 
+    api_key="ollama" 
 )
 messages = [
     {
@@ -15,7 +15,7 @@ messages = [
         )
     }
 ]
-print("Hello welcome to GiggleByte! Type 'exit' to stop.\n")
+print("Hello! Welcome to GiggleByte! Type 'exit' to stop.\n")
 while True:
     user_input = input("You: ")
     if(user_input.lower().strip() in ["exit"]):
