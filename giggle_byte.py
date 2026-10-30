@@ -3,6 +3,22 @@ import random
 import time
 from openai import OpenAI
 from spinner import Spinner 
+from tools import TOOL_SCHEMAS, run_tool
+
+#tool calls
+def resolve_tool_calls(client, messages, model="llama3.1"):
+    resp = client.chat.completions.create(
+        model=model, messages=messages, tools=TOOL_SCHEMAS
+    )
+    msg = resp.choices[0].message
+    if not msg.tool_calls:
+        return  # model needs no (more) tools
+    messages.append(msg)
+    for call in msg.tool_calls:
+        result = run_tool(call.function.name, call.function.arguments)
+        messages.append(
+            {"role": "tool", "tool_call_id": call.id, "content": result}
+        )
 
 # Helper function for typewriter effect
 def typewriter_print(text, base_delay=0.03):
@@ -52,6 +68,7 @@ while True:
     spinner = Spinner("GiggleByte is typing")
     spinner.start()
     messages.append({"role":"user","content":user_input})
+    resolve_tool_calls(client, messages) 
     response = client.chat.completions.create(
         model="llama3.1",                      
         stream=True,
